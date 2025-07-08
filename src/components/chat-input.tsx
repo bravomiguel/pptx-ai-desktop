@@ -63,7 +63,11 @@ export function ChatInput({
   };
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} className="flex w-full pb-6 px-4 pt-3">
+    <form
+      ref={formRef}
+      onSubmit={onSubmit}
+      className="flex w-full pb-6 px-4 pt-3"
+    >
       <div className="max-w-3xl mx-auto w-full relative border border-gray-300 rounded-lg ring-offset-background transition-all focus-within:ring-2 focus-within:ring-gray-600">
         {/* Container for textarea and button */}
         <div className="relative p-2 pb-3">
@@ -94,7 +98,7 @@ export function ChatInput({
               className="rounded-full h-8 w-8 hover:bg-gray-100 flex items-center justify-center"
               onClick={() => {
                 /* Handle attachment logic */
-                console.log("Attachment button clicked");
+                window.electron.ipcRenderer.send("ping");
               }}
             >
               <Paperclip className="h-4 w-4" />
