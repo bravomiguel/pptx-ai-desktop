@@ -1,7 +1,8 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { User } from "lucide-react"
+import { User, FileText } from "lucide-react"
+import Link from "next/link"
 
 export default function Header() {
   return (
@@ -12,6 +13,11 @@ export default function Header() {
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <Link href="/pptx-converter">
+          <Button variant="ghost" size="icon" title="PPTX Converter">
+            <FileText className="w-4 h-4" />
+          </Button>
+        </Link>
         <Button variant="ghost" size="icon">
           <User className="w-4 h-4" />
         </Button>
