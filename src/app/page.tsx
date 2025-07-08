@@ -43,6 +43,7 @@ export default function Viewer() {
   const [currentSlide, setCurrentSlide] = useState(1)
   const [zoomLevel, setZoomLevel] = useState(100)
   const [isThumbnailsCollapsed, setIsThumbnailsCollapsed] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const handleSlideChange = (slideId: number) => {
     setCurrentSlide(slideId)
@@ -51,26 +52,34 @@ export default function Viewer() {
   const handleThumbnailsCollapse = (collapsed: boolean) => {
     setIsThumbnailsCollapsed(collapsed)
   }
+  
+  const handleFileSelect = (file: File | null) => {
+    setSelectedFile(file)
+  }
 
   return (
     <div className="h-screen flex flex-col bg-background">
       <Header />
       <div className="flex flex-1 min-h-0 overflow-hidden flex-col md:flex-row">
-        <ChatSidebar />
+        <ChatSidebar selectedFile={selectedFile} />
         <MainView
           slides={slides}
           currentSlide={currentSlide}
           onSlideChange={handleSlideChange}
           zoomLevel={zoomLevel}
           isThumbnailsCollapsed={isThumbnailsCollapsed}
+          selectedFile={selectedFile}
+          onFileSelect={handleFileSelect}
         />
-        <Thumbnails
-          slides={slides}
-          currentSlide={currentSlide}
-          onSlideChange={handleSlideChange}
-          onCollapseChange={handleThumbnailsCollapse}
-          isCollapsed={isThumbnailsCollapsed}
-        />
+        {selectedFile && (
+          <Thumbnails
+            slides={slides}
+            currentSlide={currentSlide}
+            onSlideChange={handleSlideChange}
+            onCollapseChange={handleThumbnailsCollapse}
+            isCollapsed={isThumbnailsCollapsed}
+          />
+        )}
       </div>
     </div>
   )

@@ -12,7 +12,11 @@ import {
   ChevronDown,
 } from "lucide-react"
 
-export default function ChatSidebar() {
+interface ChatSidebarProps {
+  selectedFile: File | null;
+}
+
+export default function ChatSidebar({ selectedFile }: ChatSidebarProps) {
   const [messages, setMessages] = useState<Array<{type: 'user' | 'ai', content: string}>>([]);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -123,7 +127,14 @@ export default function ChatSidebar() {
 
       {/* Chat Input - Fixed at bottom */}
       <div>
+        {!selectedFile && (
+          <div className="px-4 py-3 text-sm text-muted-foreground text-center bg-muted/20">
+            Please select a PowerPoint file to start chatting
+          </div>
+        )}
         <ChatInput 
+          isLoading={false}
+          disabled={!selectedFile}
           onSendMessage={(message) => {
             // Dummy handler logic - will be implemented later
             console.log("Message sent:", message);

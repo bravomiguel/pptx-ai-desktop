@@ -8,11 +8,13 @@ import { ArrowUp, Paperclip } from "lucide-react";
 interface ChatInputProps {
   onSendMessage?: (message: string) => void;
   isLoading?: boolean;
+  disabled?: boolean;
 }
 
 export function ChatInput({
   onSendMessage,
   isLoading = false,
+  disabled = false,
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -74,8 +76,8 @@ export function ChatInput({
           {/* Textarea with bottom padding for button */}
           <div className="pb-8">
             <Textarea
-              placeholder="Ask a follow-up..."
-              disabled={isLoading}
+              placeholder={disabled ? "Select a PowerPoint file to start chatting" : "Ask a follow-up..."}
+              disabled={isLoading || disabled}
               className="px-2 shadow-none min-h-[24px] max-h-[216px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 rounded-md w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
               value={message}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -127,7 +129,7 @@ export function ChatInput({
                 type="submit"
                 size="icon"
                 className="rounded-full h-8 w-8 border bg-gray-900 hover:bg-gray-700 flex items-center justify-center"
-                disabled={isLoading || !message.trim()}
+                disabled={isLoading || !message.trim() || disabled}
               >
                 <ArrowUp className="h-5 w-5 text-white" />
               </Button>
