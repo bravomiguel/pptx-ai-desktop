@@ -43,24 +43,17 @@ export default function Thumbnails({ slides, currentSlide, onSlideChange, onColl
             {slides.map((slide) => (
               <Card
                 key={slide.id}
-                className={`cursor-pointer transition-all shadow-none ${
+                className={`cursor-pointer transition-all shadow-none overflow-hidden ${
                   currentSlide === slide.id ? "ring-2 ring-primary bg-primary/5" : "hover:bg-muted/50"
                 }`}
                 onClick={() => onSlideChange(slide.id)}
               >
-                <div className="p-1.5">
-                  <div className="flex items-start gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="aspect-video w-full overflow-hidden rounded border relative">
-                        <img
-                          src={slide.thumbnail || "/placeholder.svg"}
-                          alt={`Slide ${slide.id} thumbnail`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1 text-ellipsis overflow-hidden">{slide.title}</p>
-                    </div>
-                  </div>
+                <div className="aspect-video w-full overflow-hidden">
+                  <img
+                    src={slide.thumbnail || "/placeholder.svg"}
+                    alt={`Slide ${slide.id} thumbnail`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </Card>
             ))}

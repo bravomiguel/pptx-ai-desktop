@@ -256,10 +256,10 @@ export default function MainView({
             {/* Main Slide View */}
             <div className="flex-1 flex items-center justify-center p-6 overflow-auto">
               <Card
-                className={`w-full aspect-[16/9] flex items-center justify-center bg-white shadow-none transition-all duration-300`}
+                className={`w-full aspect-[16/9] flex items-center justify-center bg-white shadow-none transition-all duration-300 overflow-hidden`}
               >
                 <div
-                  className="w-full h-full flex items-center justify-center overflow-hidden relative"
+                  className="w-full h-full flex items-center justify-center overflow-hidden"
                   style={{ transform: `scale(${zoomLevel / 100})` }}
                 >
                   <img
@@ -269,7 +269,6 @@ export default function MainView({
                     }
                     alt={`Slide ${currentSlide}`}
                     className="max-w-full max-h-full object-contain"
-                    style={{ maxWidth: "100%", height: "auto" }}
                   />
                 </div>
               </Card>
