@@ -22,6 +22,8 @@ const createWindow = () => {
     webPreferences: {
       preload: join(__dirname, "preload.js"),
       nodeIntegration: true,
+      webSecurity: false,          // (Disables CORS, allows file://)
+      allowRunningInsecureContent: true,
     },
   });
 

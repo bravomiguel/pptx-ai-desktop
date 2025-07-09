@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import Image from "next/image"
+// Next.js Image component removed
 
 type Slide = {
   id: number
@@ -19,9 +19,10 @@ type Props = {
   onSlideChange: (slideId: number) => void
   onCollapseChange: (collapsed: boolean) => void
   isCollapsed: boolean
+  isLoading?: boolean
 }
 
-export default function Thumbnails({ slides, currentSlide, onSlideChange, onCollapseChange, isCollapsed }: Props) {
+export default function Thumbnails({ slides, currentSlide, onSlideChange, onCollapseChange, isCollapsed, isLoading = false }: Props) {
 
   return (
     <div className={`h-full bg-background flex flex-col transition-all duration-300 ${isCollapsed ? 'w-10' : 'w-full md:w-48'}`}>
@@ -51,12 +52,10 @@ export default function Thumbnails({ slides, currentSlide, onSlideChange, onColl
                   <div className="flex items-start gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="aspect-video w-full overflow-hidden rounded border relative">
-                        <Image
+                        <img
                           src={slide.thumbnail || "/placeholder.svg"}
                           alt={`Slide ${slide.id} thumbnail`}
-                          fill
-                          sizes="100%"
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                         />
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1 text-ellipsis overflow-hidden">{slide.title}</p>

@@ -6,44 +6,19 @@ import ChatSidebar from "@/components/chat-sidebar"
 import MainView from "@/components/main-view"
 import Thumbnails from "@/components/thumbnails"
 
-const slides = [
-  {
-    id: 1,
-    title: "Paid Searches - Recent Projects For Training",
-    thumbnail: "/placeholder.svg?height=120&width=160",
-  },
-  {
-    id: 2,
-    title: "Paid Search Content Overview",
-    thumbnail: "/placeholder.svg?height=120&width=160",
-  },
-  {
-    id: 3,
-    title: "UK Advertising Market Analysis",
-    thumbnail: "/placeholder.svg?height=120&width=160",
-  },
-  {
-    id: 4,
-    title: "Digital Marketing Overview",
-    thumbnail: "/placeholder.svg?height=120&width=160",
-  },
-  {
-    id: 5,
-    title: "Brand Paid Search Example",
-    thumbnail: "/placeholder.svg?height=120&width=160",
-  },
-  {
-    id: 6,
-    title: "Brand Paid Search User Journey",
-    thumbnail: "/placeholder.svg?height=120&width=160",
-  },
-]
+type Slide = {
+  id: number
+  title: string
+  thumbnail: string
+}
 
 export default function Viewer() {
   const [currentSlide, setCurrentSlide] = useState(1)
   const [zoomLevel, setZoomLevel] = useState(100)
   const [isThumbnailsCollapsed, setIsThumbnailsCollapsed] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [slides, setSlides] = useState<Slide[]>([])
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSlideChange = (slideId: number) => {
     setCurrentSlide(slideId)
@@ -55,6 +30,20 @@ export default function Viewer() {
   
   const handleFileSelect = (file: File | null) => {
     setSelectedFile(file)
+    if (!file) {
+      setSlides([])
+    }
+  }
+  
+  const handleSlidesUpdate = (newSlides: Slide[]) => {
+    setSlides(newSlides)
+    if (newSlides.length > 0) {
+      setCurrentSlide(1)
+    }
+  }
+  
+  const handleLoadingChange = (loading: boolean) => {
+    setIsLoading(loading)
   }
 
   return (
@@ -70,14 +59,18 @@ export default function Viewer() {
           isThumbnailsCollapsed={isThumbnailsCollapsed}
           selectedFile={selectedFile}
           onFileSelect={handleFileSelect}
+          onSlidesUpdate={handleSlidesUpdate}
+          isLoading={isLoading}
+          onLoadingChange={handleLoadingChange}
         />
-        {selectedFile && (
+        {(selectedFile && slides.length > 0) && (
           <Thumbnails
             slides={slides}
             currentSlide={currentSlide}
             onSlideChange={handleSlideChange}
             onCollapseChange={handleThumbnailsCollapse}
             isCollapsed={isThumbnailsCollapsed}
+            isLoading={isLoading}
           />
         )}
       </div>
