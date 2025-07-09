@@ -48,7 +48,7 @@ export default function Viewer() {
 
   return (
     <div className="h-screen flex flex-col bg-background">
-      <Header />
+      <Header onFileSelect={handleFileSelect} />
       <div className="flex flex-1 min-h-0 overflow-hidden flex-col md:flex-row">
         <ChatSidebar selectedFile={selectedFile} />
         <MainView
@@ -63,7 +63,7 @@ export default function Viewer() {
           isLoading={isLoading}
           onLoadingChange={handleLoadingChange}
         />
-        {(selectedFile && slides.length > 0) && (
+        {(selectedFile && slides.length > 0 && !isLoading) && (
           <Thumbnails
             slides={slides}
             currentSlide={currentSlide}

@@ -49,6 +49,50 @@ export default function MainView({
   const [pdfPath, setPdfPath] = useState<string | null>(null);
   const [imagePaths, setImagePaths] = useState<string[]>([]);
 
+  // Load slides from localStorage on component mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const savedSlides = localStorage.getItem("savedSlides");
+        if (savedSlides) {
+          const parsedSlides = JSON.parse(savedSlides);
+          if (Array.isArray(parsedSlides) && parsedSlides.length > 0) {
+            onSlidesUpdate(parsedSlides);
+            // If we have slides but no selected file, create a placeholder
+            if (!selectedFile) {
+              onFileSelect(new File([""], "restored-presentation.pptx", { type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" }));
+            }
+            toast.success("Loaded previously saved slides");
+          }
+        }
+      } catch (error) {
+        console.error("Error loading slides from localStorage:", error);
+      }
+    }
+  }, []);
+  
+  // Watch for changes to selectedFile from external sources (like the header)
+  useEffect(() => {
+    if (selectedFile && isElectronAvailable) {
+      // Check if this is a new file (not our placeholder from localStorage)
+      if (selectedFile.name !== "restored-presentation.pptx" || selectedFile.size > 0) {
+        try {
+          const filePath = (selectedFile as any).path;
+          if (filePath) {
+            // Clear existing slides before starting the conversion process
+            onSlidesUpdate([]);
+            onLoadingChange(true);
+            convertPptxToPdf(filePath);
+          }
+        } catch (error) {
+          console.error("Error processing file from header:", error);
+          toast.error("Failed to process PowerPoint file");
+          onLoadingChange(false);
+        }
+      }
+    }
+  }, [selectedFile]);
+
   // Check if window.electron is available (we're in Electron environment)
   const isElectronAvailable = typeof window !== "undefined" && window.electron;
 
@@ -124,6 +168,17 @@ export default function MainView({
 
           // Update slides in parent component
           onSlidesUpdate(newSlides);
+          
+          // Save slides to localStorage (replacing any previous slides)
+          try {
+            // Clear any existing slides first
+            localStorage.removeItem("savedSlides");
+            // Then save the new slides
+            localStorage.setItem("savedSlides", JSON.stringify(newSlides));
+          } catch (error) {
+            console.error("Error saving slides to localStorage:", error);
+          }
+          
           toast.success(
             `PDF converted to ${result.imagePaths.length} images successfully`
           );
