@@ -6,6 +6,15 @@ import { join, dirname, basename } from "path";
 import { exec } from "child_process";
 import { existsSync, mkdirSync } from "fs";
 
+// Define working files directory
+const userDataPath = app.getPath('userData'); // e.g. ~/Library/Application Support/MyApp on macOS
+const workingDir = join(userDataPath, 'working-files');
+
+// Create working files directory if it doesn't exist
+if (!existsSync(workingDir)) {
+  mkdirSync(workingDir, { recursive: true });
+}
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -67,8 +76,8 @@ const startNextJSServer = async () => {
  */
 const convertPptxToPdf = (pptxPath: string, outputDir?: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    // If no output directory is provided, use the same directory as the PPTX file
-    const finalOutputDir = outputDir || dirname(pptxPath);
+    // If no output directory is provided, use the working files directory
+    const finalOutputDir = outputDir || workingDir;
     
     // Create the output directory if it doesn't exist
     if (!existsSync(finalOutputDir)) {

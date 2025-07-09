@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { ChevronLeft, ChevronRight, Upload } from "lucide-react"
+import { ChevronLeft, ChevronRight, Upload, FileText } from "lucide-react"
 import Image from "next/image"
+import { toast } from "sonner"
 
 type Slide = {
   id: number
@@ -25,12 +26,66 @@ type Props = {
 
 export default function MainView({ slides, currentSlide, onSlideChange, zoomLevel, isThumbnailsCollapsed = false, selectedFile, onFileSelect }: Props) {
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [isConverting, setIsConverting] = useState(false);
+  const [pdfPath, setPdfPath] = useState<string | null>(null);
+
+  // Check if window.electron is available (we're in Electron environment)
+  const isElectronAvailable = typeof window !== 'undefined' && window.electron;
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
     if (file && file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
       onFileSelect(file);
-      // Leave follow-up logic empty for now
       console.log('File selected:', file.name);
+      
+      if (isElectronAvailable) {
+        try {
+          // Get the file path directly from the file object
+          // In Electron, we can use a special property to get the actual path
+          const filePath = (file as any).path;
+          
+          if (filePath) {
+            // Convert the selected file to PDF
+            convertPptxToPdf(filePath);
+          } else {
+            // If path is not available (which can happen in certain environments),
+            // inform the user
+            toast.error('Could not access file path. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error processing file:', error);
+          toast.error('Failed to process PowerPoint file');
+        }
+      }
+    }
+  };
+  
+  const convertPptxToPdf = async (pptxPath: string) => {
+    if (!isElectronAvailable) {
+      toast.error('Electron API not available');
+      return;
+    }
+    
+    try {
+      setIsConverting(true);
+      toast.info('Converting PowerPoint to PDF...');
+      
+      // Get the working files directory path from the main process
+      // and convert the PPTX to PDF
+      // Use type assertion to avoid TypeScript errors
+      const result = await (window.electron as any).pptxToPdf.convertPptxToPdf(pptxPath);
+      
+      if (result.success && result.pdfPath) {
+        setPdfPath(result.pdfPath);
+        toast.success('PowerPoint file converted to PDF successfully');
+      } else {
+        toast.error(`Conversion failed: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error converting PPTX to PDF:', error);
+      toast.error('Failed to convert PowerPoint to PDF');
+    } finally {
+      setIsConverting(false);
     }
   };
 
@@ -108,10 +163,22 @@ export default function MainView({ slides, currentSlide, onSlideChange, zoomLeve
                     accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"
                     className="sr-only"
                     onChange={handleFileChange}
+                    disabled={isConverting}
                   />
                 </div>
               </label>
             </div>
+            {isConverting && (
+              <div className="mt-4 text-center">
+                <div className="animate-pulse text-primary">Converting PowerPoint to PDF...</div>
+              </div>
+            )}
+            {pdfPath && (
+              <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                <FileText className="w-4 h-4" />
+                <span>PDF saved at: {pdfPath}</span>
+              </div>
+            )}
           </Card>
         </div>
       )}
