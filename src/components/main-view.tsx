@@ -267,13 +267,14 @@ export default function MainView({
             </div>
             {/* Main Slide View */}
             <div className="flex-1 flex items-center justify-center p-6 overflow-auto">
-              <Card
-                className={`w-full aspect-[16/9] flex items-center justify-center bg-white shadow-none transition-all duration-300 overflow-hidden`}
+              <div
+                className="w-full h-auto max-h-[calc(100vh-200px)] bg-white border overflow-hidden flex items-center justify-center"
+                style={{
+                  transform: `scale(${zoomLevel / 100})`,
+                  maxWidth: "100%",
+                }}
               >
-                <div
-                  className="w-full h-full flex items-center justify-center overflow-hidden"
-                  style={{ transform: `scale(${zoomLevel / 100})` }}
-                >
+                <div className="relative w-full h-full flex items-center justify-center bg-gray-100">
                   <img
                     src={
                       slides[currentSlide - 1]?.thumbnail ||
@@ -281,9 +282,10 @@ export default function MainView({
                     }
                     alt={`Slide ${currentSlide}`}
                     className="max-w-full max-h-full object-contain"
+                    style={{ width: "100%" }}
                   />
                 </div>
-              </Card>
+              </div>
             </div>
           </>
         ) : (
@@ -315,12 +317,6 @@ export default function MainView({
                   </div>
                 </label>
               </div>
-              {/* {pdfPath && (
-                <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                  <FileText className="w-4 h-4" />
-                  <span>PDF saved at: {pdfPath}</span>
-                </div>
-              )} */}
             </Card>
           </div>
         )
@@ -351,25 +347,6 @@ export default function MainView({
                 </div>
               </label>
             </div>
-            {isLoading && (
-              <div className="mt-4 text-center">
-                <div className="animate-pulse text-primary">
-                  Loading file...
-                </div>
-              </div>
-            )}
-            {/* {pdfPath && (
-              <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                <FileText className="w-4 h-4" />
-                <span>PDF saved at: {pdfPath}</span>
-              </div>
-            )} */}
-            {/* {imagePaths.length > 0 && (
-              <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                <ImageIcon className="w-4 h-4" />
-                <span>{imagePaths.length} images generated</span>
-              </div>
-            )} */}
           </Card>
         </div>
       )}
