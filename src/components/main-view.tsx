@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { ChevronLeft, ChevronRight, Upload, FileText } from "lucide-react"
+import { ChevronLeft, ChevronRight, Upload, FileText, ImageIcon } from "lucide-react"
 import Image from "next/image"
 import { toast } from "sonner"
 
@@ -28,6 +28,7 @@ export default function MainView({ slides, currentSlide, onSlideChange, zoomLeve
 
   const [isConverting, setIsConverting] = useState(false);
   const [pdfPath, setPdfPath] = useState<string | null>(null);
+  const [imagePaths, setImagePaths] = useState<string[]>([]);
 
   // Check if window.electron is available (we're in Electron environment)
   const isElectronAvailable = typeof window !== 'undefined' && window.electron;
@@ -78,6 +79,14 @@ export default function MainView({ slides, currentSlide, onSlideChange, zoomLeve
       if (result.success && result.pdfPath) {
         setPdfPath(result.pdfPath);
         toast.success('PowerPoint file converted to PDF successfully');
+        
+        // Check if images were also generated
+        if (result.imagePaths && result.imagePaths.length > 0) {
+          setImagePaths(result.imagePaths);
+          toast.success(`PDF converted to ${result.imagePaths.length} images successfully`);
+        } else if (result.imageError) {
+          toast.error(`PDF to image conversion failed: ${result.imageError}`);
+        }
       } else {
         toast.error(`Conversion failed: ${result.error || 'Unknown error'}`);
       }
@@ -177,6 +186,12 @@ export default function MainView({ slides, currentSlide, onSlideChange, zoomLeve
               <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
                 <FileText className="w-4 h-4" />
                 <span>PDF saved at: {pdfPath}</span>
+              </div>
+            )}
+            {imagePaths.length > 0 && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <ImageIcon className="w-4 h-4" />
+                <span>{imagePaths.length} images generated</span>
               </div>
             )}
           </Card>

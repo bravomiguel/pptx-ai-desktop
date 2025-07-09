@@ -8,6 +8,13 @@ interface ElectronAPI {
     convertPptxToPdf: (pptxPath: string, outputDir?: string) => Promise<{
       success: boolean;
       pdfPath?: string;
+      imagePaths?: string[];
+      error?: string;
+      imageError?: string;
+    }>;
+    convertPdfToImages: (pdfPath: string, outputDir?: string, density?: number, quality?: number) => Promise<{
+      success: boolean;
+      imagePaths?: string[];
       error?: string;
     }>;
     selectPptxFile: () => Promise<{
