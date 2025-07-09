@@ -60,7 +60,11 @@ export default function MainView({
             onSlidesUpdate(parsedSlides);
             // If we have slides but no selected file, create a placeholder
             if (!selectedFile) {
-              onFileSelect(new File([""], "restored-presentation.pptx", { type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" }));
+              onFileSelect(
+                new File([""], "restored-presentation.pptx", {
+                  type: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                })
+              );
             }
             toast.success("Loaded previously saved slides");
           }
@@ -70,12 +74,15 @@ export default function MainView({
       }
     }
   }, []);
-  
+
   // Watch for changes to selectedFile from external sources (like the header)
   useEffect(() => {
     if (selectedFile && isElectronAvailable) {
       // Check if this is a new file (not our placeholder from localStorage)
-      if (selectedFile.name !== "restored-presentation.pptx" || selectedFile.size > 0) {
+      if (
+        selectedFile.name !== "restored-presentation.pptx" ||
+        selectedFile.size > 0
+      ) {
         try {
           const filePath = (selectedFile as any).path;
           if (filePath) {
@@ -86,7 +93,7 @@ export default function MainView({
           }
         } catch (error) {
           console.error("Error processing file from header:", error);
-          toast.error("Failed to process PowerPoint file");
+          toast.error("PowerPoint failed to load. Please try again.");
           onLoadingChange(false);
         }
       }
@@ -125,7 +132,7 @@ export default function MainView({
           }
         } catch (error) {
           console.error("Error processing file:", error);
-          toast.error("Failed to process PowerPoint file");
+          toast.error("PowerPoint failed to load. Please try again.");
           onLoadingChange(false); // Reset loading state on error
         }
       }
@@ -140,7 +147,8 @@ export default function MainView({
     }
 
     try {
-      toast.info("Converting PowerPoint to PDF...");
+      // toast.info("Converting PowerPoint to PDF...");
+      console.log("Converting PowerPoint to PDF...");
 
       // Get the working files directory path from the main process
       // and convert the PPTX to PDF
@@ -151,7 +159,8 @@ export default function MainView({
 
       if (result.success && result.pdfPath) {
         setPdfPath(result.pdfPath);
-        toast.success("PowerPoint file converted to PDF successfully");
+        // toast.success("PowerPoint file converted to PDF successfully");
+        console.log("PowerPoint file converted to PDF successfully");
 
         // Check if images were also generated
         if (result.imagePaths && result.imagePaths.length > 0) {
@@ -168,7 +177,7 @@ export default function MainView({
 
           // Update slides in parent component
           onSlidesUpdate(newSlides);
-          
+
           // Save slides to localStorage (replacing any previous slides)
           try {
             // Clear any existing slides first
@@ -178,23 +187,26 @@ export default function MainView({
           } catch (error) {
             console.error("Error saving slides to localStorage:", error);
           }
-          
-          toast.success(
+
+          toast.success(`PowerPoint loaded successfully`);
+          console.log(
             `PDF converted to ${result.imagePaths.length} images successfully`
           );
         } else if (result.imageError) {
-          toast.error(`PDF to image conversion failed: ${result.imageError}`);
+          toast.error(`PowerPoint failed to load. Please try again.`);
+          console.error(`PDF to image conversion failed: ${result.imageError}`);
           // Reset to file picker state on error
           onFileSelect(null);
         }
       } else {
-        toast.error(`Conversion failed: ${result.error || "Unknown error"}`);
+        toast.error(`PowerPoint failed to load. Please try again.`);
+        console.error(`Conversion failed: ${result.error || "Unknown error"}`);
         // Reset to file picker state on error
         onFileSelect(null);
       }
     } catch (error) {
       console.error("Error converting PPTX to PDF:", error);
-      toast.error("Failed to convert PowerPoint to PDF");
+      toast.error("PowerPoint failed to load. Please try again.");
       // Reset to file picker state on error
       onFileSelect(null);
     } finally {
@@ -212,9 +224,9 @@ export default function MainView({
               <div className="rounded-full bg-primary/10 p-4">
                 <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
-              <h2 className="text-xl font-semibold">Converting Presentation</h2>
+              <h2 className="text-xl font-semibold">Loading Presentation</h2>
               <p className="text-center text-muted-foreground mb-4">
-                Please wait while we convert your PowerPoint file
+                Please wait while we load your PowerPoint
               </p>
             </Card>
           </div>
@@ -281,11 +293,9 @@ export default function MainView({
               <div className="rounded-full bg-primary/10 p-4">
                 <Upload className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-xl font-semibold">
-                Select a PowerPoint File
-              </h2>
+              <h2 className="text-xl font-semibold">Select a PowerPoint</h2>
               <p className="text-center text-muted-foreground mb-4">
-                Choose a PPTX file to view and analyze
+                Choose a PPTX file to work with
               </p>
               <div className="w-full">
                 <label htmlFor="file-upload" className="cursor-pointer w-full">
@@ -305,12 +315,12 @@ export default function MainView({
                   </div>
                 </label>
               </div>
-              {pdfPath && (
+              {/* {pdfPath && (
                 <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
                   <FileText className="w-4 h-4" />
                   <span>PDF saved at: {pdfPath}</span>
                 </div>
-              )}
+              )} */}
             </Card>
           </div>
         )
@@ -321,9 +331,9 @@ export default function MainView({
             <div className="rounded-full bg-primary/10 p-4">
               <Upload className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-xl font-semibold">Select a PowerPoint File</h2>
+            <h2 className="text-xl font-semibold">Select a PowerPoint</h2>
             <p className="text-center text-muted-foreground mb-4">
-              Choose a PPTX file to view and analyze
+              Choose a PPTX file to work with
             </p>
             <div className="w-full">
               <label htmlFor="file-upload" className="cursor-pointer w-full">
@@ -344,22 +354,22 @@ export default function MainView({
             {isLoading && (
               <div className="mt-4 text-center">
                 <div className="animate-pulse text-primary">
-                  Converting PowerPoint to PDF...
+                  Loading file...
                 </div>
               </div>
             )}
-            {pdfPath && (
+            {/* {pdfPath && (
               <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
                 <FileText className="w-4 h-4" />
                 <span>PDF saved at: {pdfPath}</span>
               </div>
-            )}
-            {imagePaths.length > 0 && (
+            )} */}
+            {/* {imagePaths.length > 0 && (
               <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                 <ImageIcon className="w-4 h-4" />
                 <span>{imagePaths.length} images generated</span>
               </div>
-            )}
+            )} */}
           </Card>
         </div>
       )}
